@@ -1,0 +1,5 @@
+MI PLATA CLARA — VERSIÓN MÓVIL
+
+Para instalarla como aplicación en iPhone, la carpeta debe publicarse en una dirección web https. Una vez publicada, abra la dirección en Safari, pulse Compartir y luego “Agregar a inicio”.
+
+Los datos quedan guardados en el teléfono. Use “Descargar respaldo” periódicamente.
