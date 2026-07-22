@@ -1,0 +1,180 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-cache"><title>Mi Plata Clara</title>
+<style>
+:root{--bg:#f4efe6;--card:#fffdf8;--text:#2e332c;--muted:#777d72;--accent:#6f7865;--danger:#a9554f;--line:#ded6c7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:90px}.app{max-width:700px;margin:auto;padding:16px 14px}h1,h2,h3{font-family:Georgia,serif}h1{margin:0 0 4px}.sub,.muted,small{color:var(--muted)}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px}.hero{background:#697362;color:#fff}.hero .muted{color:#ffffffc9}.big{font-size:34px;font-weight:800;margin:6px 0 14px}.grid2,.quick,.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{padding:12px;border-radius:14px;background:#ffffff18}.metric.light{background:#f2eee6}.metric strong{display:block;margin-top:4px}.primary,.secondary,.dangerbtn{width:100%;border:0;border-radius:14px;padding:13px;font-weight:700}.primary{background:var(--accent);color:white}.secondary{background:#ece7dc}.dangerbtn{background:#f5e1de;color:var(--danger)}button,input,select{font:inherit}.quick button{border:1px solid var(--line);background:white;border-radius:14px;padding:14px;font-weight:700}.field{margin-bottom:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}.field input,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:13px;background:white}.list{display:grid;gap:8px}.item,.cardbox{border:1px solid var(--line);border-radius:14px;padding:12px;background:white}.itemhead{display:flex;justify-content:space-between;gap:10px}.expense{color:var(--danger)}.income{color:var(--accent)}.section{display:none}.section.active{display:block}.bottom{position:fixed;left:0;right:0;bottom:0;background:#fffdf8fa;border-top:1px solid var(--line);padding:8px}.bottom .inner{max-width:700px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)}.bottom button{border:0;background:transparent;padding:8px;font-size:10px}.bottom button.active{background:#ece7dc;border-radius:10px}.modal{position:fixed;inset:0;background:#0006;display:none;align-items:flex-end;z-index:10}.modal.show{display:flex}.sheet{background:var(--bg);width:100%;max-width:700px;margin:auto;border-radius:22px 22px 0 0;padding:16px;max-height:92vh;overflow:auto}.sheethead{display:flex;justify-content:space-between;align-items:center}.close{border:0;background:#e8e2d8;border-radius:50%;width:34px;height:34px}.empty{text-align:center;color:var(--muted);padding:14px}.history{margin-top:12px}.history h4{margin:0 0 8px;font-family:Georgia,serif}
+.history-row{border-top:1px solid var(--line);padding:10px 0}.history-row:first-child{border-top:0}
+.history-actions{display:flex;justify-content:flex-end;gap:14px;margin-top:5px}
+.history-actions button{border:0;background:transparent;font-size:12px;padding:2px 0}
+.editbtn{color:var(--accent)}.deletebtn{color:var(--danger)}.payment{color:var(--accent)}
+@media(max-width:520px){.grid3,.grid2,.row{grid-template-columns:1fr}}
+</style></head><body><div class="app">
+<h1>Mi Plata Clara</h1><div class="sub">Tus finanzas, sin enredos.</div><div class="field"><input type="month" id="month"></div>
+
+<section id="home" class="section active">
+<div class="card hero"><div class="muted">Presupuesto disponible</div><div class="big" id="available">$0</div><div class="grid3"><div class="metric"><span class="muted">Presupuesto</span><strong id="planned">$0</strong></div><div class="metric"><span class="muted">Gastos</span><strong id="spent">$0</strong></div><div class="metric"><span class="muted">Por día</span><strong id="daily">$0</strong></div></div></div>
+<div class="card"><h2>Registro rápido</h2><div class="quick"><button onclick="openExpense()">Registrar gasto</button><button onclick="openIncome()">Agregar ingreso</button></div></div>
+<div class="card"><h2>Sueldo mensual</h2><div id="salaryBox"></div><button class="secondary" onclick="openSalary()">Configurar sueldo</button></div>
+
+<div class="card"><h2>Tarjetas Santander</h2>
+<div class="cardbox"><h3>WorldMember</h3><div class="grid3"><div class="metric light"><span class="muted">Personal</span><strong id="wmPersonal">$0</strong></div><div class="metric light"><span class="muted">Funeraria</span><strong id="wmBusiness">$0</strong></div><div class="metric light"><span class="muted">Cupo disponible</span><strong id="wmAvailable">$0</strong></div></div><div id="wmDetails" class="muted"></div><div class="quick"><button onclick="openPurchase('worldmember')">Compra</button><button onclick="openPayment('worldmember')">Abono</button></div><button class="secondary" onclick="openCardConfig('worldmember')">Configurar WorldMember</button></div>
+<div class="cardbox"><h3>Gold</h3><div class="grid2"><div class="metric light"><span class="muted">Deuda personal</span><strong id="goldDebt">$0</strong></div><div class="metric light"><span class="muted">Cupo disponible</span><strong id="goldAvailable">$0</strong></div></div><div id="goldDetails" class="muted"></div><div class="quick"><button onclick="openPurchase('gold')">Compra</button><button onclick="openPayment('gold')">Abono</button></div><button class="secondary" onclick="openCardConfig('gold')">Configurar Gold</button></div>
+</div>
+
+<div class="card"><h2>Obligaciones del mes</h2><div id="billsList" class="list"></div><button class="secondary" onclick="openBill()">Agregar obligación</button></div>
+<div class="card"><h2>Últimos movimientos</h2><div id="recentList" class="list"></div></div>
+</section>
+
+<section id="income" class="section"><div class="card"><h2>Ingresos</h2><div id="incomeList" class="list"></div></div></section>
+<section id="moves" class="section"><div class="card"><h2>Movimientos</h2><div id="allMoves" class="list"></div></div></section>
+<section id="analysis" class="section"><div class="card"><h2>Resumen</h2><div id="categorySummary" class="list"></div></div></section>
+<section id="backup" class="section"><div class="card"><h2>Respaldo</h2><button class="secondary" onclick="exportBackup()">Descargar respaldo</button><label class="secondary" style="display:block;text-align:center;margin-top:8px">Restaurar<input id="restoreFile" type="file" accept=".json" style="display:none"></label><button class="dangerbtn" onclick="clearAll()" style="margin-top:8px">Borrar datos</button></div></section>
+</div>
+
+<nav class="bottom"><div class="inner"><button class="active" data-tab="home">Inicio</button><button data-tab="income">Ingresos</button><button data-tab="moves">Movimientos</button><button data-tab="analysis">Resumen</button><button data-tab="backup">Respaldo</button></div></nav>
+
+<div id="expenseModal" class="modal"><div class="sheet"><div class="sheethead"><h2>Registrar gasto</h2><button class="close" onclick="closeM('expenseModal')">×</button></div><form id="expenseForm"><div class="field"><label>Monto</label><input id="expenseAmount" type="number" required></div><div class="field"><label>Categoría</label><select id="expenseCategory"></select></div><div class="field"><label>Descripción</label><input id="expenseNote"></div><div class="field"><label>Fecha</label><input id="expenseDate" type="date" required></div><div class="field"><label>Medio</label><select id="expenseMethod"><option>Débito Santander</option><option>Efectivo</option><option>Transferencia</option><option>WorldMember</option><option>Gold</option></select></div><div class="field" id="expenseOwnerField"><label>Corresponde a</label><select id="expenseOwner"><option value="personal">Personal</option><option value="business">Funeraria Almaserena</option></select></div><button class="primary">Guardar</button></form></div></div>
+
+<div id="incomeModal" class="modal"><div class="sheet"><div class="sheethead"><h2>Agregar ingreso</h2><button class="close" onclick="closeM('incomeModal')">×</button></div><form id="incomeForm"><div class="field"><label>Monto</label><input id="incomeAmount" type="number" required></div><div class="field"><label>Tipo</label><select id="incomeSource"><option>Venta e-book</option><option>Venta Elder Care</option><option>Honorarios</option><option>Regalo o ayuda</option><option>Devolución</option><option>Otro ingreso</option></select></div><div class="field"><label>Fecha</label><input id="incomeDate" type="date" required></div><button class="primary">Guardar</button></form></div></div>
+
+<div id="salaryModal" class="modal"><div class="sheet"><div class="sheethead"><h2>Sueldo</h2><button class="close" onclick="closeM('salaryModal')">×</button></div><form id="salaryForm"><div class="field"><label>Monto mensual</label><input id="salaryAmount" type="number" required></div><div class="field"><label>¿Recibido?</label><select id="salaryReceived"><option value="no">No</option><option value="yes">Sí</option></select></div><div class="field"><label>Fecha real</label><input id="salaryPaidDate" type="date"></div><button class="primary">Guardar</button></form></div></div>
+
+<div id="cardConfigModal" class="modal"><div class="sheet"><div class="sheethead"><h2 id="cardConfigTitle">Configurar tarjeta</h2><button class="close" onclick="closeM('cardConfigModal')">×</button></div><form id="cardConfigForm"><input type="hidden" id="configCardKey"><div class="field"><label>Cupo total</label><input id="cardLimit" type="number" required></div><div class="field"><label>Deuda personal inicial</label><input id="openingPersonal" type="number" required></div><div class="field" id="openingBusinessField"><label>Deuda funeraria inicial</label><input id="openingBusiness" type="number"></div><div class="field"><label>Pago mínimo</label><input id="cardMinimum" type="number"></div><div class="field"><label>Cierre</label><input id="cardCloseDate" type="date"></div><div class="field"><label>Vencimiento</label><input id="cardDueDate" type="date"></div><button class="primary">Guardar</button></form></div></div>
+
+<div id="cardPurchaseModal" class="modal"><div class="sheet"><div class="sheethead"><h2 id="purchaseTitle">Compra</h2><button class="close" onclick="closeM('cardPurchaseModal')">×</button></div><form id="cardPurchaseForm"><input type="hidden" id="purchaseCardKey"><div class="field"><label>Monto</label><input id="cpAmount" type="number" required></div><div class="field"><label>Categoría</label><select id="cpCategory"></select></div><div class="field"><label>Descripción</label><input id="cpNote"></div><div class="field"><label>Fecha</label><input id="cpDate" type="date" required></div><div class="field" id="cpOwnerField"><label>Responsable</label><select id="cpOwner"><option value="personal">Personal</option><option value="business">Funeraria Almaserena</option></select></div><button class="primary">Guardar</button></form></div></div>
+
+<div id="cardPaymentModal" class="modal"><div class="sheet"><div class="sheethead"><h2 id="paymentTitle">Abono</h2><button class="close" onclick="closeM('cardPaymentModal')">×</button></div><form id="cardPaymentForm"><input type="hidden" id="paymentCardKey"><div class="field"><label>Monto</label><input id="payAmount" type="number" required></div><div class="field"><label>Fecha</label><input id="payDate" type="date" required></div><div class="field" id="payOwnerField"><label>Quién abonó</label><select id="payOwner"><option value="personal">Yo</option><option value="business">Funeraria Almaserena</option></select></div><button class="primary">Guardar</button></form></div></div>
+
+
+<div id="editMovementModal" class="modal"><div class="sheet">
+<div class="sheethead"><h2 id="editMovementTitle">Editar movimiento</h2><button class="close" onclick="closeM('editMovementModal')">×</button></div>
+<form id="editMovementForm">
+<input type="hidden" id="editMovementId">
+<div class="field"><label>Tipo</label><input id="editMovementType" disabled></div>
+<div class="field"><label>Monto</label><input id="editMovementAmount" type="number" min="1" required></div>
+<div class="field"><label>Fecha</label><input id="editMovementDate" type="date" required></div>
+<div class="field" id="editOwnerField"><label>Responsable</label>
+<select id="editMovementOwner"><option value="personal">Personal</option><option value="business">Funeraria Almaserena</option></select></div>
+<div id="editPurchaseFields">
+<div class="field"><label>Categoría</label><select id="editMovementCategory"></select></div>
+<div class="field"><label>Descripción</label><input id="editMovementNote"></div>
+</div>
+<button class="primary">Guardar cambios</button>
+</form></div></div>
+
+<div id="billModal" class="modal"><div class="sheet"><div class="sheethead"><h2>Agregar obligación</h2><button class="close" onclick="closeM('billModal')">×</button></div><form id="billForm"><div class="field"><label>Tipo</label><select id="billName"><option>Crédito hipotecario</option><option>Intereses línea de crédito</option><option>Línea de crédito</option><option>WorldMember</option><option>Gold</option><option>Luz</option><option>Agua</option><option>Gas</option><option>Internet</option><option>Gastos comunes</option><option>Otro</option></select></div><div class="field"><label>Monto</label><input id="billAmount" type="number" required></div><div class="field"><label>Vencimiento</label><input id="billDue" type="date" required></div><button class="primary">Guardar</button></form></div></div>
+
+<script>
+const cats=["Crédito hipotecario","Intereses línea de crédito","Línea de crédito","WorldMember","Gold","Luz","Agua","Gas","Internet","Gastos comunes","Supermercado","Alimentación","Cigarrillos","Transporte","Bencina","Mascotas","Salud","Belleza","Salidas","Ropa","Farmacia","Otros"];
+const $=id=>document.getElementById(id), emptyCard=()=>({limit:0,openingPersonal:0,openingBusiness:0,minimum:0,closeDate:"",dueDate:""});
+const blank={salary:{amount:0},salaryMonths:{},incomes:[],transactions:[],cardMovements:[],bills:[],cards:{worldmember:emptyCard(),gold:emptyCard()}};
+let data;try{data=JSON.parse(localStorage.getItem("mpc_two_cards")||"null")||blank}catch(e){data=blank}
+const now=new Date(),iso=now.toISOString().slice(0,10);$("month").value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;["expenseDate","incomeDate","cpDate","payDate","billDue"].forEach(id=>$(id).value=iso);
+function save(){localStorage.setItem("mpc_two_cards",JSON.stringify(data))}function money(v){return new Intl.NumberFormat("es-CL",{style:"currency",currency:"CLP",maximumFractionDigits:0}).format(v||0)}function mk(){return $("month").value}function closeM(id){$(id).classList.remove("show")}function label(k){return k==="worldmember"?"WorldMember":"Gold"}
+function openExpense(){$("expenseCategory").innerHTML=cats.map(x=>`<option>${x}</option>`).join("");$("expenseModal").classList.add("show")}function openIncome(){$("incomeModal").classList.add("show")}function openSalary(){const r=data.salaryMonths[mk()]||{};$("salaryAmount").value=data.salary.amount||"";$("salaryReceived").value=r.received?"yes":"no";$("salaryPaidDate").value=r.paidDate||"";$("salaryModal").classList.add("show")}
+function openCardConfig(k){const c=data.cards[k]||emptyCard();$("configCardKey").value=k;$("cardConfigTitle").textContent=`Configurar ${label(k)}`;$("cardLimit").value=c.limit||0;$("openingPersonal").value=c.openingPersonal||0;$("openingBusiness").value=c.openingBusiness||0;$("cardMinimum").value=c.minimum||0;$("cardCloseDate").value=c.closeDate||"";$("cardDueDate").value=c.dueDate||"";$("openingBusinessField").style.display=k==="worldmember"?"block":"none";$("cardConfigModal").classList.add("show")}
+function openPurchase(k){$("purchaseCardKey").value=k;$("purchaseTitle").textContent=`Compra ${label(k)}`;$("cpCategory").innerHTML=cats.map(x=>`<option>${x}</option>`).join("");$("cpOwnerField").style.display=k==="worldmember"?"block":"none";$("cardPurchaseModal").classList.add("show")}function openPayment(k){$("paymentCardKey").value=k;$("paymentTitle").textContent=`Abono ${label(k)}`;$("payOwnerField").style.display=k==="worldmember"?"block":"none";$("cardPaymentModal").classList.add("show")}function openBill(){$("billModal").classList.add("show")}
+$("expenseMethod").onchange=()=>{$("expenseOwnerField").style.display=$("expenseMethod").value==="Gold"?"none":"block"}
+$("salaryForm").onsubmit=e=>{e.preventDefault();data.salary.amount=+$("salaryAmount").value;data.salaryMonths[mk()]={received:$("salaryReceived").value==="yes",paidDate:$("salaryPaidDate").value};save();closeM("salaryModal");render()}
+$("incomeForm").onsubmit=e=>{e.preventDefault();const date=$("incomeDate").value;data.incomes.push({id:String(Date.now()),amount:+$("incomeAmount").value,source:$("incomeSource").value,date,month:date.slice(0,7)});save();e.target.reset();$("incomeDate").value=iso;closeM("incomeModal");render()}
+$("expenseForm").onsubmit=e=>{e.preventDefault();const id=String(Date.now()),method=$("expenseMethod").value,card=method==="WorldMember"?"worldmember":method==="Gold"?"gold":null,owner=card==="gold"?"personal":$("expenseOwner").value,amount=+$("expenseAmount").value,category=$("expenseCategory").value,note=$("expenseNote").value,date=$("expenseDate").value;data.transactions.push({id,amount,owner,method,category,note,date});if(card)data.cardMovements.push({id:id+"c",card,kind:"purchase",amount,owner,date});save();e.target.reset();$("expenseDate").value=iso;closeM("expenseModal");render()}
+$("cardConfigForm").onsubmit=e=>{e.preventDefault();const k=$("configCardKey").value;data.cards[k]={limit:+$("cardLimit").value,openingPersonal:+$("openingPersonal").value,openingBusiness:k==="worldmember"?(+$("openingBusiness").value||0):0,minimum:+$("cardMinimum").value||0,closeDate:$("cardCloseDate").value,dueDate:$("cardDueDate").value};save();closeM("cardConfigModal");render()}
+$("cardPurchaseForm").onsubmit=e=>{e.preventDefault();const k=$("purchaseCardKey").value,id=String(Date.now()),owner=k==="gold"?"personal":$("cpOwner").value,amount=+$("cpAmount").value,date=$("cpDate").value,category=$("cpCategory").value,note=$("cpNote").value;data.cardMovements.push({id,card:k,kind:"purchase",amount,owner,date});data.transactions.push({id:id+"t",amount,owner,method:label(k),category,note,date});save();e.target.reset();$("cpDate").value=iso;closeM("cardPurchaseModal");render()}
+$("cardPaymentForm").onsubmit=e=>{e.preventDefault();const k=$("paymentCardKey").value,owner=k==="gold"?"personal":$("payOwner").value;data.cardMovements.push({id:String(Date.now()),card:k,kind:"payment",amount:+$("payAmount").value,owner,date:$("payDate").value});save();e.target.reset();$("payDate").value=iso;closeM("cardPaymentModal");render()}
+$("billForm").onsubmit=e=>{e.preventDefault();data.bills.push({id:String(Date.now()),name:$("billName").value,amount:+$("billAmount").value,due:$("billDue").value,paid:false});save();e.target.reset();$("billDue").value=iso;closeM("billModal");render()}
+
+function linkedTx(m){
+  const candidates=[];
+  const mid=String(m.id);
+  if(mid.endsWith("c")) candidates.push(mid.slice(0,-1));
+  candidates.push(mid+"t");
+  let tx=data.transactions.find(x=>candidates.includes(String(x.id)));
+  if(!tx && m.kind==="purchase"){
+    tx=data.transactions.find(x=>x.date===m.date && Number(x.amount)===Number(m.amount) &&
+      x.owner===m.owner && (x.method===label(m.card) || x.method===(m.card==="worldmember"?"WorldMember":"Gold")));
+  }
+  return tx||null;
+}
+function cardHistoryHtml(card){
+  const rows=data.cardMovements.filter(x=>x.card===card).slice().sort((a,b)=>
+    String(b.date||"").localeCompare(String(a.date||"")) || String(b.id).localeCompare(String(a.id)));
+  if(!rows.length) return '<div class="empty">Todavía no hay movimientos.</div>';
+  return rows.map(m=>{
+    const tx=linkedTx(m), purchase=m.kind==="purchase";
+    const title=purchase?(tx?.note||tx?.category||"Compra"):"Abono";
+    const owner=m.owner==="business"?"Funeraria":"Personal";
+    return `<div class="history-row">
+      <div class="itemhead">
+        <div><strong>${title}</strong><br><small>${(m.date||"").split("-").reverse().join("/")} · ${purchase?(tx?.category||"Compra"):"Abono"} · ${owner}</small></div>
+        <strong class="${purchase?"expense":"payment"}">${purchase?"−":"+"}${money(m.amount)}</strong>
+      </div>
+      <div class="history-actions">
+        <button type="button" class="editbtn" onclick="openEditMovement('${m.id}')">Editar</button>
+        <button type="button" class="deletebtn" onclick="deleteMovement('${m.id}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.openEditMovement=function(id){
+  const m=data.cardMovements.find(x=>String(x.id)===String(id));
+  if(!m){alert("No se encontró el movimiento.");return;}
+  const tx=linkedTx(m), purchase=m.kind==="purchase";
+  $("editMovementId").value=m.id;
+  $("editMovementTitle").textContent=`Editar ${purchase?"compra":"abono"} ${label(m.card)}`;
+  $("editMovementType").value=purchase?"Compra":"Abono";
+  $("editMovementAmount").value=m.amount;
+  $("editMovementDate").value=m.date||"";
+  $("editMovementOwner").value=m.owner||"personal";
+  $("editOwnerField").style.display=m.card==="worldmember"?"block":"none";
+  $("editPurchaseFields").style.display=purchase?"block":"none";
+  $("editMovementCategory").innerHTML=cats.map(x=>`<option>${x}</option>`).join("");
+  $("editMovementCategory").value=tx?.category||"Otros";
+  $("editMovementNote").value=tx?.note||"";
+  $("editMovementModal").classList.add("show");
+};
+$("editMovementForm").onsubmit=function(e){
+  e.preventDefault();
+  const id=$("editMovementId").value;
+  const m=data.cardMovements.find(x=>String(x.id)===String(id));
+  if(!m){alert("No se encontró el movimiento.");return;}
+  const tx=linkedTx(m);
+  m.amount=Number($("editMovementAmount").value);
+  m.date=$("editMovementDate").value;
+  m.owner=m.card==="gold"?"personal":$("editMovementOwner").value;
+  if(tx){
+    tx.amount=m.amount;
+    tx.date=m.date;
+    tx.owner=m.owner;
+    if(m.kind==="purchase"){
+      tx.category=$("editMovementCategory").value;
+      tx.note=$("editMovementNote").value;
+    }
+  }
+  save();
+  closeM("editMovementModal");
+  render();
+};
+window.deleteMovement=function(id){
+  const m=data.cardMovements.find(x=>String(x.id)===String(id));
+  if(!m){alert("No se encontró el movimiento.");return;}
+  if(!confirm(`¿Eliminar este ${m.kind==="purchase"?"gasto":"abono"} de ${money(m.amount)}?`)) return;
+  const tx=linkedTx(m);
+  data.cardMovements=data.cardMovements.filter(x=>String(x.id)!==String(id));
+  if(tx) data.transactions=data.transactions.filter(x=>String(x.id)!==String(tx.id));
+  save();
+  render();
+};
+
+function debt(card,owner){const c=data.cards[card]||emptyCard(),opening=owner==="personal"?(c.openingPersonal||0):(c.openingBusiness||0);return Math.max(0,opening+data.cardMovements.filter(x=>x.card===card&&x.owner===owner).reduce((s,x)=>s+(x.kind==="purchase"?x.amount:-x.amount),0))}
+function daysLeft(){const [y,m]=mk().split("-").map(Number),last=new Date(y,m,0).getDate(),t=new Date();return t.getFullYear()===y&&t.getMonth()+1===m?Math.max(last-t.getDate()+1,1):last}
+function movement(x){return `<div class="item"><div class="itemhead"><div><strong>${x.note||x.category}</strong><br><small>${x.date.split("-").reverse().join("/")} · ${x.method} · ${x.owner==="business"?"Funeraria":"Personal"}</small></div><strong class="expense">−${money(x.amount)}</strong></div></div>`}
+function details(k){const c=data.cards[k]||emptyCard();return `Cupo total: ${money(c.limit)} · Pago mínimo: ${money(c.minimum)}<br>Cierre: ${c.closeDate||"—"} · Vencimiento: ${c.dueDate||"—"}`}
+function render(){const m=mk(),tx=data.transactions.filter(x=>x.date&&x.date.startsWith(m)).sort((a,b)=>b.date.localeCompare(a.date)),mins=data.incomes.filter(x=>x.month===m),salary=data.salary.amount||0,sm=data.salaryMonths[m]||{},planned=salary+mins.reduce((s,x)=>s+x.amount,0),pexp=tx.filter(x=>x.owner==="personal").reduce((s,x)=>s+x.amount,0),avail=planned-pexp;
+$("planned").textContent=money(planned);$("spent").textContent=money(pexp);$("available").textContent=money(avail);$("daily").textContent=money(Math.max(avail,0)/daysLeft());$("salaryBox").innerHTML=salary?`<div class="item"><strong>${money(salary)}</strong><br><small>${sm.received?"Recibido":"Pendiente"}</small></div>`:'<div class="empty">Sin sueldo configurado.</div>';
+const wmp=debt("worldmember","personal"),wmb=debt("worldmember","business"),wm=data.cards.worldmember||emptyCard();$("wmPersonal").textContent=money(wmp);$("wmBusiness").textContent=money(wmb);$("wmAvailable").textContent=money(Math.max(wm.limit-wmp-wmb,0));$("wmDetails").innerHTML=details("worldmember");
+const gd=debt("gold","personal"),g=data.cards.gold||emptyCard();$("goldDebt").textContent=money(gd);$("goldAvailable").textContent=money(Math.max(g.limit-gd,0));$("goldDetails").innerHTML=details("gold");$("wmHistory").innerHTML=cardHistoryHtml("worldmember");$("goldHistory").innerHTML=cardHistoryHtml("gold");
+$("recentList").innerHTML=tx.slice(0,5).map(movement).join("")||'<div class="empty">Sin movimientos.</div>';$("allMoves").innerHTML=tx.map(movement).join("")||'<div class="empty">Sin movimientos.</div>';$("incomeList").innerHTML=[...(salary?[{source:"Sueldo Almaserena",amount:salary}]:[]),...mins].map(x=>`<div class="item"><div class="itemhead"><strong>${x.source}</strong><strong class="income">+${money(x.amount)}</strong></div></div>`).join("")||'<div class="empty">Sin ingresos.</div>';
+$("billsList").innerHTML=data.bills.map(b=>`<div class="item"><div class="itemhead"><div><strong>${b.name}</strong><br><small>${b.paid?"Pagada":"Pendiente"} · ${b.due.split("-").reverse().join("/")}</small></div><div><strong>${money(b.amount)}</strong><br><button onclick="toggleBill('${b.id}')">${b.paid?"Pendiente":"Pagada"}</button></div></div></div>`).join("")||'<div class="empty">Sin obligaciones.</div>';
+const sums={};tx.filter(x=>x.owner==="personal").forEach(x=>sums[x.category]=(sums[x.category]||0)+x.amount);$("categorySummary").innerHTML=Object.entries(sums).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="item"><div class="itemhead"><strong>${k}</strong><span>${money(v)}</span></div></div>`).join("")||'<div class="empty">Sin gastos.</div>'}
+window.toggleBill=id=>{const b=data.bills.find(x=>x.id===id);if(b){b.paid=!b.paid;save();render()}};$("month").onchange=render;document.querySelectorAll(".bottom button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".bottom button").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));$(b.dataset.tab).classList.add("active")});
+function dl(name,content){const blob=new Blob([content],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}window.exportBackup=()=>dl("respaldo-mi-plata-clara.json",JSON.stringify(data,null,2));$("restoreFile").onchange=async e=>{data=JSON.parse(await e.target.files[0].text());save();render()};window.clearAll=()=>{if(confirm("¿Borrar todos los datos?")){data=JSON.parse(JSON.stringify(blank));save();render()}};save();render();
+</script></body></html>
